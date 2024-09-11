@@ -16,10 +16,12 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace libfive {
 
 /*
- *  A PerThreadBRep is a thread-safe class used when to a BRep from multiple
+ *  A PerThreadBRep is a thread-safe class used when to a BRep（Boundary Representation） from multiple
  *  threads simultaneously.  Construct a set of PerThreadBReps (one per thread)
  *  with the same atomic counter, then collect them with BRep::collect to merge
  *  them into a single model.
+ *  PerThreadBRep 是一个用于多线程环境下的边界表示（Boundary Representation, BRep）构建的类模板，主要用于在不同线程中并发地生成并存储几何体的顶点和边界信息。
+ *  类模板 PerThreadBRep 可以处理 N 维的几何数据（通常是 2D 或 3D）
  */
 template <unsigned N>
 class PerThreadBRep

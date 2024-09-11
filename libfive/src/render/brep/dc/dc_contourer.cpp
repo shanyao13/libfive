@@ -13,7 +13,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 #include "libfive/render/brep/per_thread_brep.hpp"
 
 namespace libfive {
-
+    //该函数的作用是检查在给定的 DCTree 对（ts）中是否需要生成等值线。如果是，则调用另一个模板函数 load<A, D> 来处理具体的生成操作。
 template <Axis::Axis A>
 void DCContourer::load(const std::array<const DCTree<2>*, 2>& ts)
 {
@@ -60,6 +60,7 @@ void DCContourer::load(const std::array<const DCTree<2>*, 2>& ts)
 }
 
 
+//该函数根据提供的 DCTree 对象的状态，计算和记录等值线的顶点和边缘信息。
 template <Axis::Axis A, bool D>
 void DCContourer::load(const std::array<const DCTree<2>*, 2>& ts)
 {

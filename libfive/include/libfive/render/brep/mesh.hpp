@@ -14,12 +14,13 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace libfive {
 
-// Forward declaration
+// Forward declaration：在 C++ 中，前向声明（Forward Declaration）用于告知编译器某个类或结构体的存在，而不提供其完整定义。这种声明方式在编译时可以减少依赖关系，提高编译速度，并解决循环依赖的问题。
 class Evaluator;
 struct BRepSettings;
 
 template <unsigned N> class Region;
 
+//在这个 Mesh 类中，有多个静态成员函数和一个保护成员函数，主要用于网格渲染、文件保存和调试功能
 class Mesh : public BRep<3> {
 public:
     /*

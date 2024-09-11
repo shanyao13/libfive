@@ -62,7 +62,7 @@ using TreeDataVariant = std::variant<
 
 /*  TreeData is a wrapper struct around the TreeDataVariant.
  *
- *  It's a wrapper struct to make recursive variants work, since TreeData
+ *  It's a wrapper struct to make recursive variants work(解决递归变体的问题), since TreeData
  *  had to be forward-declared to be used in Tree.
  *
  *  The struct includes a reference count, to track ownership and destruciton.

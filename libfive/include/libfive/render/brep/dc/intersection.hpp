@@ -15,6 +15,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace libfive {
 
+    //这段代码定义了一个名为 Intersection 的模板结构体，属于 libfive 命名空间，用于处理和存储在离散曲面网格（DCMesh）算法中的交点信息。它涉及到求解最小二乘问题以确定交点的几何特性。
 template <unsigned N>
 struct Intersection {
     Intersection()
@@ -64,6 +65,7 @@ struct Intersection {
         return mp;
     }
 
+    //计算和返回交点的伪秩。伪秩用于描述 AtA 矩阵的非满秩情况，通常用于最小二乘问题的条件数检查
     uint8_t get_rank() const {
         if (rank == -1) {
             // Use the pseudo-rank of the AtA matrix to assign

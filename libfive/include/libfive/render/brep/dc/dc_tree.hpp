@@ -34,7 +34,10 @@ template <unsigned N> class Region;
 template <unsigned N> class DCNeighbors;
 
 /*  AMBIGUOUS leaf cells have more data, which we heap-allocate in
- *  this struct to keep the overall tree smaller. */
+ *  this struct to keep the overall tree smaller.
+ *
+ *  DCLeaf 是一个模板结构体，用于存储树的叶子节点（DCLeaf）。在 DCTree 类的上下文中，DCLeaf 主要用于表示树的一个叶节点，其中包含了一些附加的数据，以处理更复杂的情况，如模糊的表面交叉
+ *  */
 template <unsigned N>
 struct DCLeaf
 {
@@ -89,6 +92,8 @@ struct DCLeaf
     ALIGNED_OPERATOR_NEW_AND_DELETE(DCLeaf)
 };
 
+
+//DCTree 类是一个基于八叉树或四叉树的实现，用于高效处理多维数据的分割与网格生成。该类继承自 XTree 基类，支持自适应细分，并能够将数据区域分为已填充、未填充或模糊区域，用于后续的三维或二维网格生成。
 template <unsigned N>
 class DCTree : public XTree<N, DCTree<N>, DCLeaf<N>>
 {

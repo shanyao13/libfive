@@ -27,6 +27,7 @@ class VolTree;
 /*
  *  A WorkerPool is used to construct a recursive tree (quadtree / octree)
  *  by sharing the work among a pool of threads.
+ *  WorkerPool 用于通过线程池共享工作来构建递归树（四叉树/八叉树）
  */
 template <typename T, typename Neighbors, unsigned N>
 class WorkerPool

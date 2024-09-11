@@ -16,6 +16,8 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace libfive {
 
+
+    //XTree 是一个泛型模板类，用于表示具有自适应细分特性的树结构，例如四叉树、八叉树等。该类为树的基本操作提供了多种方法，并通过子类（如 DCTree）继承并扩展其功能。
 template <unsigned N, typename T, typename L>
 class XTree
 {

@@ -28,6 +28,7 @@ public:
 
     /*
      *  Called by Dual::walk to construct the triangle mesh
+     *  ts 是一个 std::array 类型的数组，包含四个指向 DCTree<3> 类型的常量指针，即 std::array<const DCTree<3>*, 4>；
      */
     template <Axis::Axis A>
     void load(const std::array<const DCTree<3>*, 4>& ts);

@@ -13,6 +13,8 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace libfive {
 
+    //ProgressHandler 类的主要功能是处理任务进度的跟踪和更新，并在需要时通知用户或系统进度的变化。
+    // 它通过多线程机制定期检查进度状态，并可以根据需要在不同阶段（Phase）中更新进度信息
 class ProgressHandler
 {
 public:

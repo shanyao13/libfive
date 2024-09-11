@@ -33,6 +33,9 @@ IntervalEvaluator::IntervalEvaluator(std::shared_ptr<Deck> d)
     // Nothing to do here
 }
 
+
+//IntervalEvaluator 的构造函数通过访问 Deck 中的变量和常量，将它们正确加载到评估器的内部结构中，为后续的区间评估做好准备。
+// 这些步骤确保在评估过程中，所有必要的数据都已正确设置。通过这样的初始化，IntervalEvaluator 可以对变量、常量和子句进行有效的数值计算。
 IntervalEvaluator::IntervalEvaluator(
         std::shared_ptr<Deck> d, const std::map<Tree::Id, float>& vars)
     : BaseEvaluator(d, vars)

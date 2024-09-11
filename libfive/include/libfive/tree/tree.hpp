@@ -135,7 +135,16 @@ public:
      *  (2*X + 3*Y) + 5*(X - Y) ==> 7*X - 2*Y
      *
      *  If the input tree contained remap operations, it will be flattened
-     *  before optimization */
+     *  before optimization
+     *  /* 返回一个经过优化的新树！
+ *
+ * 优化后的树会进行去重：逻辑上相同的子表达式会被合并为共享的子表达式，以提高评估效率。
+ *
+ * 优化后的树还会折叠嵌套的仿射形式，例如：
+ * (2*X + 3*Y) + 5*(X - Y) ==> 7*X - 2*Y
+ *
+ * 如果输入的树包含重映射操作，这些操作会在优化之前被展平。*/
+
     Tree optimized() const;
     Tree optimized_helper(
             std::unordered_map<TreeDataKey, Tree>& canonical) const;

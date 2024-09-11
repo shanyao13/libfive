@@ -74,6 +74,7 @@ Tree::Tree(double f)
     // Nothing to do here
 }
 
+//使用初始化列表来初始化 ptr 和 flags 成员变量。
 Tree::Tree(const Data* d, bool increment_refcount, uint32_t flags)
     : ptr(d), flags(flags)
 {

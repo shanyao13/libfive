@@ -4,3 +4,7 @@ vcpkg
 .DS_Store
 __pycache__
 *.pyc
+cmake-build*
+doc
+studio
+result

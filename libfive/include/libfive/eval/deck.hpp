@@ -84,6 +84,7 @@ protected:
     /*  We can keep spare tapes around, to avoid reallocating their data */
     std::vector<std::shared_ptr<Tape>> spares;
 
+    //表示 Deck 类的 Tape 类是 Deck 的友元类。友元类允许指定的类（在这个例子中是 Tape 类）访问另一个类（在这个例子中是 Deck 类）的私有和受保护成员。
     friend class Tape;
 };
 

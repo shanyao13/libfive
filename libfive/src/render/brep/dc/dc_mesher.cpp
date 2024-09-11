@@ -72,6 +72,7 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
     }
 }
 
+//这段代码实现了一个 DCMesher::load 方法的功能，该方法用于从给定的四个 DCTree 节点中加载顶点和边信息，并将这些顶点连接成三角形
 template <Axis::Axis A, bool D>
 void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
 {

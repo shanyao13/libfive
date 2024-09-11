@@ -25,6 +25,7 @@ public:
     using Output = Contours;
     using Input = DCTree<2>;
 
+    // : 成员初始化列表
     DCContourer(PerThreadBRep<2>& m) : m(m) {}
 
     template <Axis::Axis A>

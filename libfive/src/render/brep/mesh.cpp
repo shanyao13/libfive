@@ -35,20 +35,30 @@ namespace libfive {
 std::unique_ptr<Mesh> Mesh::render(const Tree& t_, const Region<3>& r,
                                    const BRepSettings& settings)
 {
+    // 定义了一个使用 Eigen 对齐分配器的 std::vector，用于存储 Evaluator 类型的对象
+    //  Eigen::aligned_allocator 是 Eigen 库提供的一个自定义内存分配器，用于处理对齐要求较高的内存分配
     std::vector<Evaluator, Eigen::aligned_allocator<Evaluator>> es;
+    // 预分配足够的内存空间以容纳 settings.workers (8) 个 Evaluator 对象
+    // reserve() 是 std::vector 的一个成员函数，用于提前分配内存空间以容纳指定数量的元素。这样做可以避免在向 std::vector 中添加元素时频繁地重新分配内存，提高性能
     es.reserve(settings.workers);
+    //优化树。eg：优化后的树还会折叠嵌套的仿射形式，例如：(2*X + 3*Y) + 5*(X - Y) ==> 7*X - 2*Y
     const auto t = t_.optimized();
     for (unsigned i=0; i < settings.workers; ++i) {
         es.emplace_back(Evaluator(t));
     }
 
+    //es.data() 在代码中用于获取 es 容器中存储的数据的指针
+    // Evaluator对象 完成deck（tape）block value等数据设置、评估点是否inside、雅可比矩阵计算等方法
     return render(es.data(), r, settings);
 }
 
+//函数的返回值是一个指向 Mesh 对象的 std::unique_ptr，这意味着生成的网格对象的所有权被转移给调用者，保证资源的自动管理和释放
 std::unique_ptr<Mesh> Mesh::render(
         Evaluator* es,
         const Region<3>& r, const BRepSettings& settings)
 {
+    //是 C++ 中使用智能指针 std::unique_ptr 定义一个指向 Mesh 对象的独占所有权指针
+    // out是输出结果。继承父类属性：verts，branes
     std::unique_ptr<Mesh> out;
     if (settings.alg == DUAL_CONTOURING)
     {
@@ -56,6 +66,8 @@ std::unique_ptr<Mesh> Mesh::render(
             // Pool::build, Dual::walk, t.reset
             settings.progress_handler->start({1, 1, 1});
         }
+        //这段代码实现了 WorkerPool::build 函数的功能，主要用于构建一个递归树结构（如四叉树、八叉树），
+        // 通过多线程处理任务队列，以高效地处理评估任务并生成所需的树结构
         auto t = DCWorkerPool<3>::build(es, r, settings);
 
         if (settings.cancel.load() || t.get() == nullptr) {
@@ -66,6 +78,14 @@ std::unique_ptr<Mesh> Mesh::render(
         }
 
         // Perform marching squares
+        //Dual<3>::walk<DCMesher>(t, settings) 表示：
+        //
+        //调用 Dual<3> 类中的 walk 静态模板方法。
+        //walk 函数被实例化为使用 DCMesher 类型的具体实现。
+        //传入 t 和 settings 作为参数，进行具体的操作。
+        //walk函数将针对DCMesher这个特定的类型进行特化。
+        //Dual<3>::walk<DCMesher>(t, settings); 这段代码中的 <DCMesher> 是模板参数，表示 walk 函数在执行时使用了 DCMesher 类型作为模板参数 M。
+        // 在 C++ 中，模板参数的作用是让函数或类在编译时根据具体的类型进行实例化，从而实现泛型编程
         out = Dual<3>::walk<DCMesher>(t, settings);
 
         // TODO: check for early return here again

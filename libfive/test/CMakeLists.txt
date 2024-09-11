@@ -33,6 +33,7 @@ set(SRCS main.cpp
     xtree.cpp
     util/mesh_checks.cpp
     util/shapes.cpp)
+
 set(LIBS libfive)
 
 add_executable(libfive-test ${SRCS})

@@ -236,6 +236,8 @@ std::unique_ptr<typename M::Output> Dual<N>::walk(
             const BRepSettings& settings,
             A... args)
 {
+    //[&args...](PerThreadBRep<N>& brep, int i)：这是一个lambda表达式，它捕获了参数包args（通过引用捕获），
+    // 并接受两个参数：PerThreadBRep<N>& brep和int i。PerThreadBRep<N>是一个与线程相关的B-rep（边界表示）数据结构，i是一个整数索引
     return walk_<M>(
             t, settings,
             [&args...](PerThreadBRep<N>& brep, int i) {
@@ -245,6 +247,9 @@ std::unique_ptr<typename M::Output> Dual<N>::walk(
 
 }
 
+
+//这段代码是 Dual<N>::walk_ 函数的实现，主要功能是并行处理三维（或更高维）数据，利用多线程和任务队列生成几何体或网格。
+// 这是一个通用的并行计算框架，结合了模板编程、锁自由数据结构、多线程和回调工厂函数来完成任务
 template <unsigned N>
 template<typename M>
 std::unique_ptr<typename M::Output> Dual<N>::walk_(
@@ -258,6 +263,11 @@ std::unique_ptr<typename M::Output> Dual<N>::walk_(
     tasks.push(t.get());
     t->resetPending();
 
+    //线程设置和进度初始化:
+    //
+    //std::atomic<uint32_t> global_index(1): 一个全局索引，用于多线程之间的同步。
+    //std::vector<PerThreadBRep<N>> breps: 每个线程的网格生成器数据结构，用于存储生成的部分网格。
+    //settings.progress_handler->nextPhase(t.size() + 1): 如果有进度处理器，设置进度阶段。
     std::atomic<uint32_t> global_index(1);
     std::vector<PerThreadBRep<N>> breps;
     for (unsigned i=0; i < settings.workers; ++i) {
@@ -268,6 +278,11 @@ std::unique_ptr<typename M::Output> Dual<N>::walk_(
         settings.progress_handler->nextPhase(t.size() + 1);
     }
 
+    //启动多线程任务:
+    //
+    //std::vector<std::future<void>> futures: 存储每个线程的 future 对象。
+    //std::atomic_bool done(false): 用于指示所有线程的完成状态。
+    //使用 std::async 启动多个线程，每个线程创建一个 Mesher 实例并运行 Dual<N>::run 方法来处理任务
     std::vector<std::future<void>> futures;
     futures.resize(settings.workers);
     std::atomic_bool done(false);
@@ -275,6 +290,14 @@ std::unique_ptr<typename M::Output> Dual<N>::walk_(
         futures[i] = std::async(std::launch::async,
             [&breps, &tasks, &MesherFactory, &settings, &done, i]()
             {
+                //auto m = MesherFactory(breps[i], i);:
+                //
+                //使用 MesherFactory 工厂函数为当前线程创建一个网格生成器对象 m。
+                //breps[i] 是当前线程的局部网格生成数据结构，i 是当前线程的索引。
+                //Dual<N>::run(m, tasks, settings, done);:
+                //
+                //调用 Dual<N>::run 函数，该函数使用 Mesher 对象 m 处理任务队列 tasks。
+                //settings 包含任务的相关配置，done 用于线程之间的同步，标识任务的完成状态。
                 auto m = MesherFactory(breps[i], i);
                 Dual<N>::run(m, tasks, settings, done);
             });
