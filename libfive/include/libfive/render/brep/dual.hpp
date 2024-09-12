@@ -123,12 +123,17 @@ void Dual<2>::handleTopEdges(T* t, Mesher& m)
 
 ////////////////////////////////////////////////////////////////////////////////
 // 3D Implementation
+    //edge3 函数是 DC (Dual Contouring) 算法的一部分，专门用于处理 3D 网格中的边缘生成。此函数采用递归方式遍历并处理八叉树结构的节点，根据需要生成边缘数据。
+    //这种边缘数据是 3D 网格的重要组成部分，决定了网格的几何形态
+    //edge3 函数是一个模板函数，用于递归地处理网格的边缘，生成相应的几何信息。
 template <typename T, typename V, Axis::Axis A>
 void edge3(const std::array<const T*, 4> ts, V& v)
 {
     constexpr auto Q = Axis::Q(A);
     constexpr auto R = Axis::R(A);
 
+    //edge3 函数的主要功能是递归遍历给定的四个节点（ts），并根据节点是否为分支节点决定下一步操作。
+    //如果遇到分支节点（非叶子节点），函数会继续递归处理子节点，直到处理到叶子节点，再由 v 对象加载边缘数据
     if (std::any_of(ts.begin(), ts.end(),
         [](const T* t){ return t->isBranch(); }))
     {
@@ -137,10 +142,13 @@ void edge3(const std::array<const T*, 4> ts, V& v)
     }
     else
     {
+        //ts 长度为 4 的节点数组，包含四个树节点，代表当前边缘的四个顶点。
         v.template load<A>(ts);
     }
 }
 
+    //用于处理 3D 网格的面生成
+    //在 3D 网格处理中，面是构成体的基本单元，而 face3 函数递归地遍历树结构，确保面和边被正确地处理和生成
 template <typename T, typename V, Axis::Axis A>
 void face3(const std::array<const T*, 2> ts, V& v)
 {
@@ -387,6 +395,7 @@ void Dual<N>::run(V& v,
         for (t = t->parent; t && t->pending-- == 0; t = t->parent)
         {
             // Do the actual DC work (specialized for N = 2 or 3)
+            // v：DCMesh
             Dual<N>::work(t, v);
 
             // Report trees as completed
