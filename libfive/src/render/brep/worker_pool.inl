@@ -158,40 +158,9 @@ void WorkerPool<T, Neighbors, N>::run(
         // give other threads the chance to populate more pointers.
         Neighbors neighbors;
         if (t->parent)
-        };
-        up();
-        while (t != nullptr && t->collectChildren(eval, tape,
-                                                  object_pool,
-                                                  settings.max_err))
-        {
-            // Report the volume of completed trees as we walk back
-            // up towards the root of the tree.
-            if (settings.progress_handler) {
-                settings.progress_handler->tick();
-            }
-            up();
-        }
-
-        // Termination condition:  if we've ended up pointing at the parent
-        // of the tree's root (which is nullptr), then we're done and break
-        if (t == nullptr)
-        {
-            break;
-        }
-    }
-
-    // If we've broken out of the loop, then we should set the done flag
-    // so that other worker threads also terminate.
-    done.store(true);
-
-    {   // Release the pooled objects to the root
-        std::lock_guard<std::mutex> lock(root_lock);
-        root.claim(object_pool);
-    }
-}
         {
             neighbors = task.parent_neighbors.push(
-                t->parent_index, t->parent->children);
+                    t->parent_index, t->parent->children);
         }
 
         // If this tree is larger than the minimum size, then it will either

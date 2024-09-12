@@ -200,11 +200,15 @@ template <typename T, typename V>
 void Dual<3>::work(const T* t, V& v)
 {
     // Call the face procedure on every pair of cells (4x per axis)
+    //call_face3 函数用于处理每个坐标轴的面。对于三维空间，每个坐标轴都需要处理 4 个相邻的面，这里分别调用 Axis::X、Axis::Y 和 Axis::Z 方向的处理函数。
+    //call_face3 函数的具体实现会根据当前的坐标轴 (Axis::X, Axis::Y, Axis::Z) 来处理面，并生成相应的网格数据
     call_face3<T, V, Axis::X>(t, v);
     call_face3<T, V, Axis::Y>(t, v);
     call_face3<T, V, Axis::Z>(t, v);
 
     // Call the edge function 6 times (2x per axis)
+    //call_edge3 函数用于处理每个坐标轴的边缘。每个坐标轴需要处理 2 个相邻的边缘，分别调用 Axis::X、Axis::Y 和 Axis::Z 方向的处理函数。
+    //call_edge3 函数的具体实现会根据当前的坐标轴 (Axis::X, Axis::Y, Axis::Z) 来处理边缘，并生成相应的网格数据
     call_edge3<T, V, Axis::X>(t, v);
     call_edge3<T, V, Axis::Y>(t, v);
     call_edge3<T, V, Axis::Z>(t, v);
@@ -236,7 +240,7 @@ void Dual<3>::handleTopEdges(T* t, V& v)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
+//        out = Dual<3>::walk<DCMesher>(t, settings); M:DCMesher
 template <unsigned N>
 template<typename M, typename ... A>
 std::unique_ptr<typename M::Output> Dual<N>::walk(
@@ -395,7 +399,7 @@ void Dual<N>::run(V& v,
         for (t = t->parent; t && t->pending-- == 0; t = t->parent)
         {
             // Do the actual DC work (specialized for N = 2 or 3)
-            // v：DCMesh
+            // v：DCMesher
             Dual<N>::work(t, v);
 
             // Report trees as completed
