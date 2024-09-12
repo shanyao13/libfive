@@ -334,6 +334,7 @@ std::unique_ptr<typename M::Output> Dual<N>::walk_(
 }
 
 
+// T Mesher对象
 template <unsigned N>
 template <typename T, typename V>
 void Dual<N>::run(V& v,
@@ -399,7 +400,7 @@ void Dual<N>::run(V& v,
         for (t = t->parent; t && t->pending-- == 0; t = t->parent)
         {
             // Do the actual DC work (specialized for N = 2 or 3)
-            // v：DCMesher
+            // t：DCMesher
             Dual<N>::work(t, v);
 
             // Report trees as completed

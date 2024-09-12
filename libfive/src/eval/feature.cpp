@@ -97,6 +97,8 @@ bool Feature::check(const Feature& other) const
             [&](const Eigen::Vector3f& e){ return temp.push(e); });
 }
 
+//Feature::check 方法用于判断一个三维向量 e 是否与当前对象的 epsilons 向量集中的所有向量构成一个非空的凸锥.
+//如果是，返回 true，否则返回 false。方法通过构造平面、多面体和角点的几何构造，使用几何和代数方法来进行判断。
 bool Feature::check(const Eigen::Vector3f& e, bool* duplicate) const
 {
     // Return early if the epsilon is already in the list

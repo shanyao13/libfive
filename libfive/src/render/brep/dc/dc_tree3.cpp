@@ -13,6 +13,11 @@ namespace libfive {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Specializations for octree
+//这个函数检查八叉树（3D空间分割的树结构）中的叶节点是否是流形（即局部表面不会自交）。它的主要逻辑包括：
+//
+//边的检查 (edges_safe)：确保每个边的中点的符号与边的端点之一的符号一致。通过检查8个子立方体的边来实现。
+//面的检查 (faces_safe)：确保每个面的中点的符号与面的四个角点的符号一致。通过检查6个子立方体的面来实现。
+//中心点的检查 (center_safe)：检查中心点的符号是否与立方体的8个角点之一一致。
 template <>
 bool DCTree<3>::leafsAreManifold(
         const std::array<DCTree<3>*, 1 << 3>& cs,
@@ -108,6 +113,13 @@ bool DCTree<3>::leafsAreManifold(
     return edges_safe && faces_safe && center_safe;
 }
 
+
+//这个函数检查角点的流形性。它使用一个预计算的表来判断特定角点掩码是否形成有效的流形。具体方法是：
+//
+//静态表 (corner_table)：定义了每种角点掩码是否有效的布尔值。这个表是通过一个Python脚本生成的，脚本的逻辑如下：
+//对每种角点掩码，检查每条边是否安全，并尝试合并不安全的边，直到无法继续合并。
+//使用一个集合来确保所有边都可以合并成一个流形。
+//该表被用来快速判断一个给定的角点掩码是否符合流形要求
 template <>
 bool DCTree<3>::cornersAreManifold(const uint8_t corner_mask)
 {
@@ -154,6 +166,7 @@ bool DCTree<3>::cornersAreManifold(const uint8_t corner_mask)
 }
 
 // Explicit initialization of template
+//DCTree<3> 是一个三维八叉树的实现，而 DCLeaf<3> 是其叶节点的实现
 template class DCTree<3>;
 template struct DCLeaf<3>;
 

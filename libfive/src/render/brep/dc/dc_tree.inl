@@ -173,6 +173,7 @@ void DCTree<N>::evalLeaf(Evaluator* eval,
     //     can find an inside-outside transition).
     // 3)  For values that are == 0 and ambiguous, call isInside
     //     (the heavy hitter of inside-outside checking).
+    //判断每个角点是否在物体的内部或外部
     auto vs = eval->values(count, *tape);
 
     // We store ambiguity here, but clear it if the point is inside

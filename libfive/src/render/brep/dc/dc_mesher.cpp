@@ -15,6 +15,12 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 namespace libfive {
 
+    // 1 第一个模板（用于选择最小层级的单元格）:
+//    这个模板方法用于处理跨越多个八叉树层级的边缘。它的主要任务是：
+//
+//    确定哪个八叉树节点（DCTree<3>）具有最小的层级，并选择该节点进行处理。
+//    判断在该边缘上是否需要生成面（通过比较边缘的符号变化）。
+//    这是一个高层次的方法，用于确定是否需要进一步处理这个边缘
 template <Axis::Axis A>
 void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
 {
@@ -48,6 +54,7 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
      *  If we were to look at corners of c or d, we wouldn't be looking at the
      *  correct edge.  Instead, we need to look at corners for the smallest cell
      *  among the function arguments.
+     *  确保在处理跨越多个八叉树层级的边缘时，始终检查最小层级的单元格。这样可以确保正确地识别边缘，并决定是否需要在该边缘上添加面
      */
     const auto index = std::min_element(ts.begin(), ts.end(),
             [](const DCTree<3>* a, const DCTree<3>* b)
@@ -72,10 +79,21 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
     }
 }
 
+// 2 第二个模板（用于生成三角形）:
+// 这个模板方法处理实际的三角形生成任务。它的主要任务是：
+//
+//从八叉树节点中提取顶点信息，并生成三角形。
+//处理顶点的顺序和极性，以避免三角形折叠。
+//根据法线计算和顶点信息生成适当的三角形，并将其添加到 branes 中。
+//这是一个低层次的方法，实际进行顶点的提取和三角形的创建
+
 //这段代码实现了一个 DCMesher::load 方法的功能，该方法用于从给定的四个 DCTree 节点中加载顶点和边信息，并将这些顶点连接成三角形
+//A: 这是一个 Axis::Axis 枚举值，表示当前处理的轴（X、Y 或 Z）。
+//D: 这是一个布尔值，决定了如何处理顶点的极性（顺序），以确保生成的三角形正确。
 template <Axis::Axis A, bool D>
 void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
 {
+    //1 解包边缘顶点对
     int es[4];
     {   // Unpack edge vertex pairs into edge indices
         auto q = Axis::Q(A);
@@ -93,6 +111,7 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
         }
     }
 
+    //3 提取顶点信息
     uint32_t vs[4];
     Eigen::Matrix<float, 3, 4> vert_positions;
     for (unsigned i=0; i < ts.size(); ++i)
@@ -121,6 +140,7 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
         vs[i] = ts[i]->leaf->index[vi];
     }
 
+    // 3 处理极性
     // Handle polarity-based windings
     if (!D)
     {
@@ -130,6 +150,7 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
         vert_positions.col(1) = vert_positions.col(2);
         vert_positions.col(2) = r;
     }
+    // 4 计算法线并保存
     // Pick a triangulation that prevents triangles from folding back
     // on each other by checking normals.
     std::array<Eigen::Vector3f, 4> norms;
@@ -149,6 +170,7 @@ void DCMesher::load(const std::array<const DCTree<3>*, 4>& ts)
     saveNorm(2, 0, 3);
     saveNorm(3, 2, 1);
 
+    // 5 生成并存储三角形
     // Helper function to push triangles that aren't simply lines
     auto push_triangle = [&](uint32_t a, uint32_t b, uint32_t c) {
         if (a != b && b != c && a != c)
