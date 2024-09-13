@@ -16,7 +16,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <iostream>
 
-#include "/Users/shanyao/zjlWorkSpace/clworkSpace/libfive-scCode-read/libfive/libfive/stdlib/stdlib_impl.cpp"
+#include "../stdlib/stdlib_impl.cpp"
 
 int main()
 {
@@ -65,7 +65,7 @@ int main()
     int sopnge_level = 2; //     //表示递归的次数或分形的深度。它决定了几何图形被细分和分形的程度，从而影响了结构的复杂性和精细度。
     libfive::Tree sponge = menger(sopnge_level);
 
-    libfive::Region<3> r({-0.5, -0.5, -0.5}, {1, 1, 1});
+    libfive::Region<3> r({-0.5, -0.5, -0.5}, {0.5, 0.5, 0.5});
 
     libfive::BRepSettings settings ;
     settings.workers = 8;
