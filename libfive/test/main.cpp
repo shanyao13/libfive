@@ -16,7 +16,7 @@ You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #include <iostream>
 
-#include "/home/dell/clWorkSpace2/libfive/libfive/stdlib/stdlib_impl.cpp"
+#include "/Users/shanyao/zjlWorkSpace/clworkSpace/libfive-scCode-read/libfive/libfive/stdlib/stdlib_impl.cpp"
 
 int main()
 {
@@ -62,14 +62,37 @@ int main()
     auto myMorph = morph(myBox, mySphere, 0.01);
     auto myMorph_2 = morph(myBox, mySphere, 0.9);
 
+    int sopnge_level = 2; //     //表示递归的次数或分形的深度。它决定了几何图形被细分和分形的程度，从而影响了结构的复杂性和精细度。
+    libfive::Tree sponge = menger(sopnge_level);
 
+    libfive::Region<3> r({-0.5, -0.5, -0.5}, {1, 1, 1});
 
-    libfive::Region<3> r({-1, -1, -1}, {1, 1, 1});
+    libfive::BRepSettings settings ;
+    settings.workers = 8;
+    // settings.alg = libfive::ISO_SIMPLEX;
+//         DUAL_CONTOURING,
+// ISO_SIMPLEX,
+// HYBRID,
 
-    libfive::BRepSettings settings;
-    auto mesh = libfive::Mesh::render(myBlend, r, settings);
+    // auto mesh = libfive::Mesh::render(sponge, r, settings);
 
-    std::string Path = "/home/dell/clWorkSpace2/libfive/result/csg/myBlend_" + std::to_string(para) + ".stl";
+    // 开始计时
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // 调用目标函数
+    auto mesh = libfive::Mesh::render(sponge, r, settings);
+
+    // 结束计时
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // 计算耗时
+    std::chrono::duration<double> elapsed = end - start;
+
+    // 输出耗时
+    std::cout << "Function execution time: " << elapsed.count() << " seconds" << std::endl;
+
+    std::string para_ALgori = "iso-worker16";
+    std::string Path = "./sponge_" + para_ALgori + ".stl";
 //    mesh->saveSTL("/home/dell/clWorkSpace2/libfive/result/csg/myBlend.stl");
     mesh->saveSTL(Path);
 

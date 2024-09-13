@@ -79,7 +79,16 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 // 2D Implementation
-template <typename T, typename V, Axis::Axis A>
+    //edge2 函数的主要作用是：
+    // 细化节点：递归地处理当前节点的子节点，特别是当节点是分支（非叶子节点）时。
+    // 加载边界数据：当节点满足特定条件（例如，两者都是 AMBIGUOUS 状态且为叶子节点）时，加载边界信息来生成网格顶点------
+//      ts：传入的是两个四叉树节点的指针数组，表示需要处理的两个节点。
+ //    v：v 是一个对象，可能是一个网格生成器，负责加载顶点信息。
+ //    perp：这是一个用于计算与当前轴 A 垂直的轴的变量。
+ //                            (Axis::X | Axis::Y) 是一个位或操作，得到一个包含 X 和 Y 的组合。
+ // A 是一个位异或操作，用于从 X 和 Y 的组合中排除当前的轴 A，得到与 A 垂直的轴（X 或 Y）
+
+    template <typename T, typename V, Axis::Axis A>
 void edge2(const std::array<const T*, 2>& ts, V& v)
 {
     constexpr uint8_t perp = (Axis::X | Axis::Y) ^ A;
@@ -98,7 +107,15 @@ void edge2(const std::array<const T*, 2>& ts, V& v)
     }
 }
 
-template <>
+    //代码功能
+    // Dual<2>::work 函数调用 edge2 函数处理一个四叉树节点
+    // t，并检查四条边，确保生成的边满足相应的几何条件。T* t 是一个四叉树节点（在二维网格中）。
+    // V& v 是一个数据结构或对象，用于存储或处理边的信息。
+    // edge2 函数被分别调用了四次，分别处理不同的边缘：
+    // 第一行和第二行：处理垂直边（沿 Y
+    // 轴）。
+    // 第三行和第四行：处理水平边（沿 X 轴）。
+    template <>
 template <typename T, typename V>
 void Dual<2>::work(const T* t, V& v)
 {

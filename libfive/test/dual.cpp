@@ -59,6 +59,10 @@ struct Walker2
     }
 
     // Check winding of contours
+    //它的主要目的是通过分析两个相邻节点的顶点位置和法向量，来收集网格生成的几何信息
+    //这个函数 load 处理二维 DCTree（四叉树）节点，计算并更新多个用于网格生成的几何属性。
+    // 函数根据两个传入的 DCTree 节点的顶点位置，计算法向量、中心点、 法向量的点积以及节点的距离和范围信息。
+    // pos 和 neg 分别记录点积的正负性，dot 记录最小点积值，min_norm 和 max_norm 分别记录最小和最大的顶点距离
     template<Axis::Axis A, bool D>
     void load(const std::array<const DCTree<2>*, 2>& ts)
     {
