@@ -42,7 +42,7 @@ Root<T> WorkerPool<T, Neighbors, N>::build(
         std::cerr << "WorkerPool::build: Invalid region for vol tree\n";
     }
 
-    //调整区域层级
+    //调整区域层级 即确定树的深度
     // region_.withResolution 主要功能是根据给定的最小特征尺寸 (min_feature) 调整区域的层级 (level)
     const auto region = region_.withResolution(settings.min_feature);
     // 创建根节点
@@ -99,6 +99,7 @@ Root<T> WorkerPool<T, Neighbors, N>::build(
         f.get();
     }
 
+    //如果表达式的值为 false，则程序会终止并输出错误信息
     assert(done.load() || settings.cancel.load());
 
     if (settings.cancel.load())
@@ -165,17 +166,24 @@ void WorkerPool<T, Neighbors, N>::run(
 
         // If this tree is larger than the minimum size, then it will either
         // be unambiguously filled/empty, or we'll need to recurse.
+        /* 树的细分与评估
+         *    如果当前t即DCTree的 t->region.level （即是设置的 min_feature = 0.1;）大于零，则进行mesh判断是否ambiguous（即是否cross）
+         *
+         */
         const bool can_subdivide = t->region.level > 0;
         if (can_subdivide)
         {
             Tape::Handle next_tape;
             if (task.vol) {
+                // 执行check，判断当前region是否在某个region中，返回其占有类型 filled/empty 或 UNKNOW
                 auto i = task.vol->check(t->region);
                 if (i == Interval::EMPTY || i == Interval::FILLED) {
                     t->setType(i);
                 }
             }
             if (t->type == Interval::UNKNOWN) {
+                //这个函数的主要目的是对给定的区域进行评估，更新相关属性。
+                //它会设置这个区域的 type（类型），以及 corners（角点）、manifold（流形）和 done（完成标志），以表示这个区域是完全处于某个模式（例如内部或外部）
                 next_tape = t->evalInterval(eval, task.tape, object_pool);
             }
             if (next_tape != nullptr) {
@@ -185,9 +193,11 @@ void WorkerPool<T, Neighbors, N>::run(
             // If this Tree is ambiguous, then push the children to the stack
             // and keep going (because all the useful work will be done
             // by collectChildren eventually).
+            // 细分子节点
             assert(t->type != Interval::UNKNOWN);
             if (t->type == Interval::AMBIGUOUS)
             {
+                // 【细分】
                 auto rs = t->region.subdivide();
                 for (unsigned i=0; i < t->children.size(); ++i)
                 {
@@ -198,13 +208,14 @@ void WorkerPool<T, Neighbors, N>::run(
                     auto next_vol = task.vol ? task.vol->push(i, rs[i].perp)
                                              : nullptr;
                     Task next{next_tree, tape, neighbors, next_vol};
+                    //将一个新的任务 next 推入一个无锁任务栈 tasks 中。如果 tasks 栈无法接受新的任务（例如，如果栈已满），则该任务会被推入一个本地栈 local 中
                     if (!tasks.bounded_push(next))
                     {
                         local.push(next);
                     }
                 }
 
-                // If we did an interval evaluation, then we either
+                // If we did an interval evaluation区间评估, then we either
                 // (a) are done with this tree because it is empty / filled
                 // (b) don't do anything until all of its children are done
                 //
@@ -215,6 +226,8 @@ void WorkerPool<T, Neighbors, N>::run(
         }
         else
         {
+            // 如果当前节点不能再细分，说明它是一个叶节点，则调用 evalLeaf 进行叶节点的评估
+            // 记录TYPE（empty / filled/ambigous），  vertex position, populating AtA / AtB / BtB.
             t->evalLeaf(eval, tape, object_pool, neighbors);
         }
 
@@ -240,6 +253,7 @@ void WorkerPool<T, Neighbors, N>::run(
         // If all of the children are done, then ask the parent to collect them
         // (recursively, merging the trees on the way up, and reporting
         // completed tree cells to the progress tracker if present).
+        // 向上合并子节点
         auto up = [&]{
             t = t->parent;
             if (t) {

@@ -82,10 +82,12 @@ Interval IntervalEvaluator::eval(
 
     for (auto& o : deck->oracles)
     {
+        //对每个 Oracle 对象调用 set(lower, upper) 方法，将区域的边界信息传递给它们，以便它们能够在评估过程中正确使用这些边界
         o->set(lower, upper);
     }
 
     deck->bindOracles(*tape);
+    //遍历 tape：tape->rbegin() 返回 tape 的反向迭代器，即从最后一个操作开始进行遍历
     for (auto itr = tape->rbegin(); itr != tape->rend(); ++itr) {
         (*this)(itr->op, itr->id, itr->a, itr->b);
     }
@@ -102,6 +104,7 @@ std::pair<Interval, Tape::Handle> IntervalEvaluator::intervalAndPush(
     return intervalAndPush(lower, upper, deck->tape);
 }
 
+    //在给定一个空间区域（由 lower 和 upper 确定）以及当前的 tape（操作栈）时，首先评估该区域的区间结果，然后返回该区间结果并更新 tape
 std::pair<Interval, Tape::Handle> IntervalEvaluator::intervalAndPush(
         const Eigen::Vector3f& lower,
         const Eigen::Vector3f& upper,

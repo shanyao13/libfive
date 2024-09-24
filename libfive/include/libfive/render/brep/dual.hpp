@@ -417,7 +417,7 @@ void Dual<N>::run(V& v,
         for (t = t->parent; t && t->pending-- == 0; t = t->parent)
         {
             // Do the actual DC work (specialized for N = 2 or 3)
-            // t：DCMesher
+            // t：tasks  mesherfactory
             Dual<N>::work(t, v);
 
             // Report trees as completed

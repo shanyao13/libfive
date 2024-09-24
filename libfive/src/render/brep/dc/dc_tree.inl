@@ -90,6 +90,7 @@ void DCLeaf<N>::reset()
     BtB = 0;
 }
 
+    //使用“区间评估”（interval evaluation）来剪枝八叉树（或类似的分层数据结构）的过程
 template <unsigned N>
 Tape::Handle DCTree<N>::evalInterval(Evaluator* eval,
                                      const Tape::Handle& tape,

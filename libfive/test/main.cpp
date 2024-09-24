@@ -80,7 +80,7 @@ int main()
     auto start = std::chrono::high_resolution_clock::now();
 
     // 调用目标函数
-    auto mesh = libfive::Mesh::render(sponge, r, settings);
+    auto mesh = libfive::Mesh::render(mySphere, r, settings);
 
     // 结束计时
     auto end = std::chrono::high_resolution_clock::now();

@@ -30,6 +30,9 @@ Tree::~Tree() {
     }
     // Special case if this tree isn't being freed here: we return early
     // to avoid allocating data on the heap.
+    // refount: 对象的引用计数。
+    // 功能：通过引用计数机制管理树节点的内存释放。
+    //首先对 ptr->refcount 进行自减操作，表示当前引用的地方减少了。如果引用计数refcount不为零，表示还有地方使用对象，不继续执行；当refcount为零时，释放对象内存
     if (--ptr->refcount) {
         return;
     }
@@ -48,7 +51,10 @@ Tree::~Tree() {
             // std::exchange to steal the pointer out from the tree; we'll
             // decrement its refcount (and possibly recurse) in later
             // iterations of the loop.
+            // 根据节点的类型（单目运算、双目运算、重映射等）处理其子节点。使用 std::exchange 函数将子节点的指针移出当前节点（置为 nullptr），并将这些子节点压入栈中。
+            // 这种做法避免了递归调用析构函数，防止栈溢出。
             if (auto d = std::get_if<TreeUnaryOp>(t)) {
+                //std::exchange 是 C++11 引入的一个实用函数，其主要功能是将一个对象的值替换为另一个值，并返回该对象的旧值。
                 todo.push(std::exchange(d->lhs.ptr, nullptr));
             } else if (auto d = std::get_if<TreeBinaryOp>(t)) {
                 todo.push(std::exchange(d->lhs.ptr, nullptr));
@@ -231,6 +237,9 @@ Tree Tree::binary(Opcode::Opcode op, const Tree& lhs, const Tree& rhs) {
 }
 
 // Use Meyer's singletons for X/Y/Z, since they're the most common trees
+    //Meyer's Singleton 是指通过在函数内使用 static 局部变量来实现单例模式。
+    //      static 变量在第一次被调用时初始化，并且在整个程序的生命周期内只初始化一次。后续调用该函数时，返回的都是同一个对象。
+    //      懒初始化、线程安全、避免重复创建
 Tree Tree::X() {
     static auto x = Tree(new Data(TreeNonaryOp { Opcode::VAR_X }));
     return x;

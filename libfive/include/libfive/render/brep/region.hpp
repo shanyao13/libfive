@@ -20,6 +20,8 @@ template <unsigned int N>
 class Region
 {
 public:
+    //Pt 表示一个包含 N 个 double 值的列向量，通常用于表示 N 维空间中的点；
+    //用来表示与 N 维区域垂直的维度坐标（剩余维度，例如，在二维空间中，Perp 就是 z 坐标）
     typedef Eigen::Array<double, N, 1> Pt;
     typedef Eigen::Array<double, 3 - N, 1> Perp;
 

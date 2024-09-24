@@ -62,17 +62,24 @@ public:
 protected:
     /*  Stored in values() and used in operator() to decide how much of the
      *  array we're addressing at once.  count_simd is rounded up to the
-     *  nearest SIMD block size; count_actual is the actual count. */
+     *  nearest SIMD block size; count_actual is the actual count.
+     *  count_simd：记录要处理的点的数量，并向上取整到 SIMD 块大小（SIMD：单指令多数据，用于并行处理）
+     *  count_actual：表示实际要处理的点的数量。与 count_simd 不同，count_actual 是未经过任何对齐操作的原始点数
+     */
     size_t count_simd;
     size_t count_actual;
 
     /*  Sets count_simd and count_actual based on count */
     void setCount(size_t count);
 
-    /*  v(clause, index) is a specific data point */
+    /*  v(clause, index) is a specific data point
+     *  二维数组，表示评估过程中的数据存储。每个子句（clause）和点（index）的值都存储在 v 中
+     */
     Eigen::Array<float, Eigen::Dynamic, N, Eigen::RowMajor> v;
 
-    /*  ambig(index) returns whether a particular slot is ambiguous */
+    /*  ambig(index) returns whether a particular slot is ambiguous
+     *  布尔型数组，用于标记某个特定的点是否是"模棱两可"的
+     */
     Eigen::Array<bool, 1, N> ambig;
 
     /*

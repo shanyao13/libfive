@@ -41,6 +41,7 @@ Tape::Handle VolTree::evalInterval(Evaluator* eval,
 {
     // Do a preliminary evaluation to prune the tree, storing the interval
     // result and an handle to the pushed tape (which we'll use when recursing)
+    //进行初步评估以修剪树结构，存储区间结果和推送的操作栈句柄（我们在递归时将使用它）
     auto o = eval->intervalAndPush(
             this->region.lower3().template cast<float>(),
             this->region.upper3().template cast<float>(),
@@ -148,6 +149,7 @@ void VolTree::releaseTo(Pool& object_pool) {
 
 Interval::State VolTree::check(const Region<3>& r) const
 {
+    //region.lower(0) 该维度tree或function的最小值！！！
     if (r.lower(0) >= region.lower(0) && r.upper(0) <= region.upper(0) &&
         r.lower(1) >= region.lower(1) && r.upper(1) <= region.upper(1) &&
         r.lower(2) >= region.lower(2) && r.upper(2) <= region.upper(2))
@@ -157,8 +159,10 @@ Interval::State VolTree::check(const Region<3>& r) const
     return Interval::UNKNOWN;
 }
 
+    //检查二维区域（Region<2>）是否在某个三维区域（region）内的函数
 Interval::State VolTree::check(const Region<2>& r) const
 {
+    //  r.perp(0) 二维区域的第三个维度（垂直）也在三维区域内
     if (r.perp(0) >= region.lower(2) && r.perp(0) <= region.upper(2) &&
         r.lower(0) >= region.lower(0) && r.upper(0) <= region.upper(0) &&
         r.lower(1) >= region.lower(1) && r.upper(1) <= region.upper(1))

@@ -108,6 +108,8 @@ ArrayEvaluator::values(size_t count, const Tape& tape)
 {
     setCount(count);
 
+    //反向遍历 Tape，执行每个操作符
+    //遍历 Tape 中的所有操作符并按顺序执行，逐步计算出各个点的函数值
     deck->bindOracles(tape);
     for (auto itr = tape.rbegin(); itr != tape.rend(); ++itr) {
         (*this)(itr->op, itr->id, itr->a, itr->b);

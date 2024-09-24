@@ -44,8 +44,10 @@ class OracleClause;
  */
 class Tree {
 public:
+    //类型别名声明：使得代码更简洁，同时增加了代码的可读性
     using Data = TreeData;
 
+    //这些是拷贝构造函数、移动构造函数以及对应的赋值运算符，用于管理 Tree 对象的生命周期，确保深度嵌套的树能高效管理内存，避免栈溢出。
     ~Tree();
     Tree(const Tree& other)
         : Tree(other.ptr, true, other.flags)
@@ -53,9 +55,15 @@ public:
     Tree(Tree&& other) noexcept
         : ptr(std::exchange(other.ptr, nullptr)), flags(other.flags)
     { /* Nothing to do here */ }
+     //这两段代码定义了 Tree 类的赋值运算符重载，分别用于 拷贝赋值 和 移动赋值
     Tree& operator=(const Tree& other) {
+        //创建一个临时Tree对象；将其赋值给 *this； 返回当前对象
+        //这种实现方式利用了 移动赋值运算符 来避免不必要的深度拷贝。临时对象通过移动赋值将其资源高效转移给当前对象
         return *this = Tree(other.ptr, true, other.flags);
     }
+ //用于处理将一个临时 Tree 对象（右值引用）赋值给另一个 Tree 对象。移动赋值运算符的目的是通过转移资源（而不是拷贝），从而提高效率，尤其是在对象内部有动态分配的资源时
+ // && 右值引用，区分它和左值引用（&），右值引用的典型用法是在需要高效资源转移的场景中，比如动态内存、文件句柄等
+ //noexcept 声明表示这个函数不会抛出任何异常。加上 noexcept 是为了在某些特殊场景（例如使用标准容器时）保证移动操作的安全性，同时还能提升性能
     Tree& operator=(Tree&& other) noexcept {
         std::swap(ptr, other.ptr);
         flags = other.flags;
@@ -64,25 +72,35 @@ public:
 
     /* Constructor to build from the raw variant pointer.  This is used to
      * build a temporary Tree around a raw pointer acquired from release(),
-     * in libfive's C API. */
+     * in libfive's C API.
+     * explicit 的作用是防止隐式类型转换。也就是说，使用这个构造函数时，不能通过隐式转换来创建 Tree 对象，必须显式调用
+     *
+     */
     explicit Tree(const Data* d)
         : Tree(d, true, 0)
     { /* Nothing to do here */ }
 
     /* These are the main constructors used to build Trees in code
-     * X, Y, and Z are singletons, since they're used a lot */
+     * X, Y, and Z are singletons, since they're used a lot
+     *  静态函数：返回代表单变量 X、Y、Z 的树，通常在3D图形或建模中使用
+     */
     static Tree X();
     static Tree Y();
     static Tree Z();
 
     /* Returns a tree for which is_invalid() = true
-     * (under the hood, uses the TreeInvalid variant) */
+     * (under the hood, uses the TreeInvalid variant)
+     * 返回一个无效的树
+     */
     static Tree invalid();
 
-    /*  Returns a new unique variable */
+    /*  Returns a new unique variable
+     *  生成一个新的唯一变量树 */
     static Tree var();
 
-    /*  Deep comparison, which could be O(N*log(N)) */
+    /*  Deep comparison, which could be O(N*log(N))
+     * 用于深度比较两个树，复杂度为 O(NlogN)
+     */
     bool eq(const Tree& other) const;
 
     /* Performs a shallow comparison of two trees
@@ -156,7 +174,9 @@ public:
      *  them against the same canonical map, then compare their ids. */
     Tree cooptimize(std::unordered_map<TreeDataKey, Tree>& canonical) const;
 
-    /*  Returns a tree with all remap operations expanded. */
+    /*  Returns a tree with all remap operations expanded.
+     *  展开所有重映射操作
+     */
     Tree flatten() const;
 
     /*  Checks the number of unique nodes in the tree */

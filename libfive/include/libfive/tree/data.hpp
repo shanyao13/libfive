@@ -98,7 +98,9 @@ struct TreeData : public TreeDataVariant
     };
 
     /*  Returns left and right-hand Tree references.
-     *  Throws a ChildException if the requested branch is missing. */
+     *  Throws a ChildException if the requested branch is missing.
+     *  返回左子树、右子树
+     */
     const Tree& lhs() const;
     const Tree& rhs() const;
     struct ChildException : public std::exception {
